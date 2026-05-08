@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String  @id @default(uuid())
+  username      String  @unique
+  email         String  @unique
+  password      String
+  owened_groups Group[] @relation("GroupOwner")
+  memberd_groups Group[] @relation("GroupMembers")
+  tasks         Task[]
+}
+
+model Group {
+  id     String  @id @default(uuid())
+  name   String
+  GroupOwner User @relation("GroupOwner", fields: [owner_id], references: [id])
+  owner_id String
+  Groupmembers User[] @relation("GroupMembers") 
+}
+
+model Task {
+  id               String   @id @default(uuid())
+  name             String
+  task_Creator_id  User     @relation(fields: [owner_id], references: [id])
+  owner_id           String
+  task_description String
+  start_date       DateTime
+  end_date         DateTime
+  status           STATUS   @default(PENDING)
+}
+
+enum STATUS {
+  PENDING
+  STARTED
+  NOTCOMPLETED
+  COMPLETED
+}
